@@ -32,12 +32,14 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'admin_interface',
+    'colorfield',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'members',
+    'base',
 ]
 
 MIDDLEWARE = [
