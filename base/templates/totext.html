@@ -35,14 +35,22 @@
     </form>
 
     <!-- Text Output Section -->
-    <div class="bg-white/20 backdrop-blur-xl p-6 rounded-3xl shadow-xl transition-transform transform hover:scale-105">
-      <h2 class="text-2xl font-semibold mb-4">Recognized Text</h2>
-      <div id="outputText" class="bg-white/20 p-4 rounded-lg h-40 overflow-y-auto shadow-md">
-        <!-- Converted text will appear here -->
+    <form id="predictBtn" action="{% url 'predict_sign' %}" method="POST" enctype="multipart/form-data">
+      <div class="bg-white/20 backdrop-blur-xl p-6 rounded-3xl shadow-xl transition-transform transform hover:scale-105">
+        <h2 class="text-2xl font-semibold mb-4">Recognized Text</h2>
+        <div id="outputText" class="bg-white/20 p-4 rounded-lg h-40 overflow-y-auto shadow-md">
+          <!-- Converted text will appear here -->
         <p class="text-xl text-white">Converted text will appear here...</p>
       </div>
-    </div>
-
+      <button id="predictBtn"
+        class="mt-4 w-full bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 
+                hover:from-pink-500 hover:via-red-500 hover:to-yellow-500 
+                text-white font-bold py-3 rounded-3xl shadow-lg 
+                transition duration-300 ease-in-out transform hover:scale-105">
+        <span>🤖 Predict ✨</span>
+      </button>
+      </div>
+    </form>
     <!-- Voice Output Section -->
     <div class="bg-white/20 backdrop-blur-xl p-6 rounded-3xl shadow-xl text-center transition-transform transform hover:scale-105">
       <h2 class="text-2xl font-semibold mb-4">Voice Output</h2>
@@ -86,6 +94,51 @@
         alert('Upload failed: ' + data.error);
       }
     });
+    document.getElementById('predictBtn').addEventListener('submit', async function (e) {
+    e.preventDefault(); // Prevent default form submit
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')  // For Django CSRF
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Prediction failed');
+      }
+
+      const result = await response.json(); // Assuming your view returns JSON
+
+      // Update the output text
+      document.getElementById('outputText').innerHTML = `<p class="text-xl text-white">${result.prediction}</p>`;
+
+    } catch (error) {
+      console.error('Error:', error);
+      document.getElementById('outputText').innerHTML = `<p class="text-xl text-red-300">Prediction error occurred.</p>`;
+    }
+  });
+
+  // Helper to get CSRF token from cookies
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 
     // Play audio (placeholder)
     function playAudio() {
