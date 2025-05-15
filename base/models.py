@@ -12,8 +12,15 @@ mp_hand = mp.solutions.hands
 hands = mp_hand.Hands(static_image_mode=False, max_num_hands=2)
 mp_draw = mp.solutions.drawing_utils
 
+import cv2
+import csv
+import pandas as pd
+import mediapipe as mp
+
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.5)
+
 def GraphFramemrk(video_path, out_csv):
-    
     cap = cv2.VideoCapture(video_path)
     frame_idx = 0
 
@@ -39,12 +46,11 @@ def GraphFramemrk(video_path, out_csv):
                 if h < len(hand_landmarks):
                     for lm in hand_landmarks[h].landmark:
                         row += [lm.x, lm.y, lm.z]
-                    # Removed drawing on frame here
-                    # mp.draw_landmarks(frame, hand_landmarks[h], mp_hand.HAND_CONNECTIONS)
                 else:
                     row += [None] * 63
 
             writer.writerow(row)
+
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
@@ -52,6 +58,14 @@ def GraphFramemrk(video_path, out_csv):
 
     cap.release()
     cv2.destroyAllWindows()
+
+    df = pd.read_csv(out_csv)
+
+    landmark_columns = df.columns.drop('frame')
+    df = df.dropna(how='all', subset=landmark_columns)
+
+    df.to_csv(out_csv, index=False)
+
 
 class GTv1GraphConfig():
     def __init__(
@@ -122,3 +136,6 @@ class GTv1GraphModel(nn.Module):
         hidden_states = self.norm(hidden_states)
         pooled = self.pool(hidden_states, batch)
         return self.classifier(pooled)
+
+config = GTv1GraphConfig()
+model = GTv1GraphModel(config)

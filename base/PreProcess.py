@@ -53,4 +53,4 @@ class HandSignSingle(Dataset):
         edge_idx = create_edge_index().repeat(1, self.max_frames)
         batch = torch.zeros(x.size(0), dtype=torch.long)
 
-        return Data(x=x, edge_index=edge_idx, batch=batch)
+        return x, edge_idx, batch
