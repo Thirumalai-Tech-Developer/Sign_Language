@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign to Text</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-teal-500 via-purple-600 to-indigo-600 min-h-screen text-white p-6 flex flex-col">
+
+  <!-- Header -->
+  <header class="text-center mb-12">
+    <h1 class="text-4xl font-extrabold tracking-tight mb-4">Sign to Text & Voice</h1>
+    <p class="text-lg text-white/90">Upload your sign language video, and we’ll recognize the sign and convert it to text and voice!</p>
+  </header>
+
+  <!-- Main Content -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start flex-grow">
+
+    <!-- Video Upload Section -->
+    <from action="/upload-video/" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="bg-white/20 backdrop-blur-xl p-6 rounded-3xl shadow-xl transition-transform transform hover:scale-105">
+        <h2 class="text-2xl font-semibold mb-4">Upload Sign Language Video</h2>
+        <input type="file" accept="video/*" class="block w-full text-black p-3 rounded-lg bg-white shadow-md">
+        <video id="previewVideo" controls class="mt-4 w-full rounded-xl hidden shadow-lg"></video>
+        </div>
+    </from>
+
+    <!-- Text Output Section -->
+    <div class="bg-white/20 backdrop-blur-xl p-6 rounded-3xl shadow-xl transition-transform transform hover:scale-105">
+      <h2 class="text-2xl font-semibold mb-4">Recognized Text</h2>
+      <div id="outputText" class="bg-white/20 p-4 rounded-lg h-40 overflow-y-auto shadow-md">
+        <!-- Converted text will appear here -->
+        <p class="text-xl text-white">Converted text will appear here...</p>
+      </div>
+    </div>
+
+    <!-- Voice Output Section -->
+    <div class="bg-white/20 backdrop-blur-xl p-6 rounded-3xl shadow-xl text-center transition-transform transform hover:scale-105">
+      <h2 class="text-2xl font-semibold mb-4">Voice Output</h2>
+      <button onclick="playAudio()" class="bg-white text-indigo-700 px-8 py-3 rounded-full font-semibold hover:bg-indigo-100 transition duration-300">
+        🔊 Play Voice
+      </button>
+      <audio id="audioOutput" class="mt-4 w-full" controls hidden></audio>
+    </div>
+
+  </div>
+
+  <!-- Footer (Fixed) -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-black/60 text-center py-4 text-white/90">
+    <p>© 2025 Akash, Thamizh_Priyan, Thirumalai, Karan. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Preview video on upload
+    const videoInput = document.querySelector('input[type="file"]');
+    const previewVideo = document.getElementById('previewVideo');
+
+    videoInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        previewVideo.src = url;
+        previewVideo.classList.remove('hidden');
+      }
+    });
+
+    // Play audio (placeholder)
+    function playAudio() {
+      const audio = document.getElementById('audioOutput');
+      // Example: you could set audio.src = 'path_to_audio.mp3';
+      alert('Audio playback would be triggered here.');
+      audio.hidden = false;
+    }
+  </script>
+
+</body>
+</html>

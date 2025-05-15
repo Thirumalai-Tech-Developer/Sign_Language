@@ -1,12 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Language Translator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    
+<body class="min-h-screen flex flex-col bg-gradient-to-br from-sky-500 via-indigo-500 to-fuchsia-600 text-white font-sans">
+
+  <!-- Header -->
+  <header class="text-center py-8 bg-white/10 backdrop-blur-md shadow-md">
+    <h1 class="text-5xl font-extrabold drop-shadow-lg">Sign Language Translator</h1>
+    <p class="text-xl mt-3 text-white/90">Convert between Text, Voice & Sign Language</p>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex flex-col md:flex-row justify-center items-center gap-10 p-10">
+    <!-- Text/Voice to Sign Card -->
+    <a href="{% url 'tosign' %}" class="bg-white/20 hover:bg-white/30 transition-all backdrop-blur-xl p-10 rounded-3xl shadow-2xl w-full md:w-1/3 text-center transform hover:scale-105 duration-300">
+      <h2 class="text-3xl font-bold mb-4">Text/Voice → Sign</h2>
+      <p class="text-lg mb-6">Input text or speak to generate sign language output.</p>
+      <button class="px-6 py-2 bg-white text-indigo-700 font-semibold rounded-full shadow hover:bg-indigo-100 transition">Try Now</button>
+    </a>
+
+    <!-- Sign to Text/Voice Card -->
+    <a href="{% url 'totext' %}" class="bg-white/20 hover:bg-white/30 transition-all backdrop-blur-xl p-10 rounded-3xl shadow-2xl w-full md:w-1/3 text-center transform hover:scale-105 duration-300">
+      <h2 class="text-3xl font-bold mb-4">Sign → Text/Voice</h2>
+      <p class="text-lg mb-6">Upload or record sign to convert into text or speech.</p>
+      <button class="px-6 py-2 bg-white text-purple-700 font-semibold rounded-full shadow hover:bg-purple-100 transition">Try Now</button>
+    </a>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white/10 backdrop-blur-md text-center text-sm py-4 mt-auto">
+    © 2025 Akash, Thamizh_Priyan, Thirumalai, Karan. All rights reserved.
+  </footer>
+
 </body>
 </html>

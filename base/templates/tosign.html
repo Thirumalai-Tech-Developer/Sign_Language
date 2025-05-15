@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Text to Sign Converter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white flex flex-col">
+
+  <header class="p-6 text-center text-3xl font-bold bg-white/10 backdrop-blur-sm">
+    Text / Voice ➜ Sign Converter
+  </header>
+
+  <main class="flex-grow flex items-center justify-center">
+    <div class="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-2xl text-center">
+
+      <h2 class="text-2xl font-semibold mb-6">Choose Input Method</h2>
+
+      <!-- Text Input -->
+      <textarea id="textInput" class="w-full p-4 rounded-md text-black mb-4" placeholder="Type your text here..."></textarea>
+
+      <!-- Buttons -->
+      <div class="flex flex-wrap justify-center gap-4 mb-6">
+        <button id="micBtn" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-semibold hover:bg-indigo-100 transition">
+          🎤 Speak
+        </button>
+        <button id="convertBtn" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-semibold hover:bg-indigo-100 transition">
+          🔁 Convert
+        </button>
+      </div>
+
+      <!-- Result Display -->
+      <div id="result" class="mt-6 hidden">
+        <h3 class="text-xl font-semibold mb-4">Sign Output</h3>
+        <!-- Example sign image (replace with actual logic later) -->
+        <img src="https://media.giphy.com/media/l41YgSO6ZrTc9nUty/giphy.gif" alt="Sign Animation" class="mx-auto rounded-lg shadow-lg max-h-64">
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center p-4 bg-white/10 backdrop-blur-sm">
+    © 2025 Akash, Thamizh_Priyan, Thirumalai, Karan. All rights reserved.
+  </footer>
+
+  <script>
+    const convertBtn = document.getElementById('convertBtn');
+    const resultDiv = document.getElementById('result');
+    const micBtn = document.getElementById('micBtn');
+    const textInput = document.getElementById('textInput');
+
+    // Dummy Convert button handler
+    convertBtn.onclick = () => {
+      if (textInput.value.trim() !== '') {
+        resultDiv.classList.remove('hidden');
+      }
+    };
+
+    // Voice to text using Web Speech API
+    micBtn.onclick = () => {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        textInput.value = event.results[0][0].transcript;
+      };
+    };
+  </script>
+</body>
+</html>
