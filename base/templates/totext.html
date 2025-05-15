@@ -18,14 +18,21 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start flex-grow">
 
     <!-- Video Upload Section -->
-    <from action="/upload-video/" method="POST" enctype="multipart/form-data">
+    <form id="uploadForm" action="{% url 'upload_video' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="bg-white/20 backdrop-blur-xl p-6 rounded-3xl shadow-xl transition-transform transform hover:scale-105">
         <h2 class="text-2xl font-semibold mb-4">Upload Sign Language Video</h2>
-        <input type="file" accept="video/*" class="block w-full text-black p-3 rounded-lg bg-white shadow-md">
+        <input type="file" name="video" accept="video/*" class="block w-full text-black p-3 rounded-lg bg-white shadow-md">
         <video id="previewVideo" controls class="mt-4 w-full rounded-xl hidden shadow-lg"></video>
+        <button type="submit" 
+          class="mt-4 w-full bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 
+                hover:from-pink-500 hover:via-red-500 hover:to-yellow-500 
+                text-white font-bold py-3 rounded-3xl shadow-lg 
+                transition duration-300 ease-in-out transform hover:scale-105">
+          🎥 Upload
+        </button>
         </div>
-    </from>
+    </form>
 
     <!-- Text Output Section -->
     <div class="bg-white/20 backdrop-blur-xl p-6 rounded-3xl shadow-xl transition-transform transform hover:scale-105">
@@ -54,15 +61,29 @@
 
   <script>
     // Preview video on upload
-    const videoInput = document.querySelector('input[type="file"]');
+    const form = document.getElementById('uploadForm');
     const previewVideo = document.getElementById('previewVideo');
 
-    videoInput.addEventListener('change', function () {
-      const file = this.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        previewVideo.src = url;
-        previewVideo.classList.remove('hidden');
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault(); // prevent normal form submit
+
+      const formData = new FormData(form);
+
+      const response = await fetch("{% url 'upload_video' %}", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        previewVideo.src = data.url;
+        previewVideo.style.display = 'block';
+      } else if (data.error) {
+        alert('Upload failed: ' + data.error);
       }
     });
 
