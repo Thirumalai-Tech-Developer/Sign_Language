@@ -11,6 +11,8 @@ import os
 import json
 from gtts import gTTS
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 MEDIA_FOLDER = settings.MEDIA_FOLDER
 TOKEN_PATH = settings.TOKENIZER_PATH
 MODEL_PATH = settings.MODEL_PATH
@@ -18,7 +20,7 @@ MODEL_PATH = settings.MODEL_PATH
 config = GTv1GraphConfig()
 model = GTv1GraphModel(config)
 
-model.load_state_dict(torch.load(MODEL_PATH, map_location='cpu'), strict=False)
+model.load_state_dict(torch.load(MODEL_PATH, map_location=device), strict=False)
 
 def base(request):
     return render(request, "index.html")
@@ -103,7 +105,7 @@ def play_video(request):
                     video_url = os.path.join(settings.MEDIA_URL, "text_video", video)
                     return JsonResponse({'video': video_url})
 
-            return JsonResponse({'error': 'Video not found'}, status=404)
+            return JsonResponse({'error': 'Video not found'}, status=404)   
 
         except Exception as e:
             print("Error:", str(e))
