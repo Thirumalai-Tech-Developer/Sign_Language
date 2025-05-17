@@ -8,6 +8,7 @@ import torch
 import base.tokenizer as tokenizer
 from .PreProcess import HandSignSingle
 import os
+import json
 from gtts import gTTS
 
 MEDIA_FOLDER = settings.MEDIA_FOLDER
@@ -84,3 +85,10 @@ def prediction(request):
         })
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def play_video(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        text = data.get('text', '')
+        
