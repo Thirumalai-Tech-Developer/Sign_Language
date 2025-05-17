@@ -8,6 +8,7 @@ import torch
 import base.tokenizer as tokenizer
 from .PreProcess import HandSignSingle
 import os
+from gtts import gTTS
 
 MEDIA_FOLDER = settings.MEDIA_FOLDER
 TOKEN_PATH = settings.TOKENIZER_PATH
@@ -37,7 +38,7 @@ def upload_video(request):
         return JsonResponse({'url': file_url})
     return JsonResponse({'error': 'No video uploaded'}, status=400)
 
-csrf_exempt
+@csrf_exempt
 def prediction(request):
     if request.method == 'POST':
         model.eval()
@@ -70,13 +71,16 @@ def prediction(request):
         prediction_id = str(prediction_id)
         predicted_label = tokenizer.tokenize(prediction_id, token_path=TOKEN_PATH)
 
+        tts = gTTS(predicted_label)
+        audio_filename = f"{latest_video.stem}.mp3"
+        audio_path = os.path.join(f"{MEDIA_FOLDER}/voice", audio_filename)
+        print(audio_path)
+        tts.save(audio_path)
+
         return JsonResponse({
             'prediction': predicted_label,
-            'video': latest_video.name
+            'video': latest_video.name,
+            'audio_url': settings.MEDIA_URL + f"voice/{audio_filename}",
         })
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-
-def speech():
-    pass

@@ -17,18 +17,21 @@
 
       <h2 class="text-2xl font-semibold mb-6">Choose Input Method</h2>
 
-      <!-- Text Input -->
-      <textarea id="textInput" class="w-full p-4 rounded-md text-black mb-4" placeholder="Type your text here..."></textarea>
+      <form id="ConvertVideo" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Text Input -->
+        <textarea id="textInput" class="w-full p-4 rounded-md text-black mb-4" placeholder="Type your text here..."></textarea>
 
-      <!-- Buttons -->
-      <div class="flex flex-wrap justify-center gap-4 mb-6">
-        <button id="micBtn" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-semibold hover:bg-indigo-100 transition">
-          🎤 Speak
-        </button>
-        <button id="convertBtn" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-semibold hover:bg-indigo-100 transition">
-          🔁 Convert
-        </button>
-      </div>
+        <!-- Buttons -->
+        <div class="flex flex-wrap justify-center gap-4 mb-6">
+          <button id="micBtn" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-semibold hover:bg-indigo-100 transition">
+            🎤 Speak
+          </button>
+          <button id="convertBtn" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-semibold hover:bg-indigo-100 transition">
+            🔁 Convert
+          </button>
+        </div>
+      </form>
 
       <!-- Result Display -->
       <div id="result" class="mt-6 hidden">
@@ -44,28 +47,54 @@
   </footer>
 
   <script>
-    const convertBtn = document.getElementById('convertBtn');
-    const resultDiv = document.getElementById('result');
-    const micBtn = document.getElementById('micBtn');
-    const textInput = document.getElementById('textInput');
+  const convertBtn = document.getElementById('convertBtn');
+  const resultDiv = document.getElementById('result');
+  const micBtn = document.getElementById('micBtn');
+  const textInput = document.getElementById('textInput');
 
-    // Dummy Convert button handler
-    convertBtn.onclick = () => {
-      if (textInput.value.trim() !== '') {
-        resultDiv.classList.remove('hidden');
-      }
+  convertBtn.onclick = () => {
+    if (textInput.value.trim() !== '') {
+      resultDiv.classList.remove('hidden');
+    }
+  };
+
+  micBtn.onclick = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('Speech Recognition is not supported in this browser. Try using Chrome.');
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    micBtn.innerText = '🎙️ Listening...';
+    micBtn.disabled = true;
+
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const speechText = event.results[0][0].transcript;
+      textInput.value = speechText;
+      micBtn.innerText = '🎤 Speak';
+      micBtn.disabled = false;
     };
 
-    // Voice to text using Web Speech API
-    micBtn.onclick = () => {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'en-US';
-      recognition.start();
-
-      recognition.onresult = (event) => {
-        textInput.value = event.results[0][0].transcript;
-      };
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      micBtn.innerText = '🎤 Speak';
+      micBtn.disabled = false;
+      alert('Speech recognition error. Please try again.');
     };
+
+    recognition.onend = () => {
+      micBtn.innerText = '🎤 Speak';
+      micBtn.disabled = false;
+    };
+  };
   </script>
 </body>
 </html>

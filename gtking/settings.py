@@ -129,6 +129,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 MEDIA_FOLDER = BASE_DIR / 'media'
+VOICE_PATH = MEDIA_FOLDER / 'voice'
 TOKENIZER_PATH = BASE_DIR / 'base' / 'token' / 'tokenizer.json'
 
 
