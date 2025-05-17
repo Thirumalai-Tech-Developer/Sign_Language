@@ -27,7 +27,7 @@
           <button id="micBtn" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-semibold hover:bg-indigo-100 transition">
             🎤 Speak
           </button>
-          <button id="convertBtn" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-semibold hover:bg-indigo-100 transition">
+          <button id="convertBtn" type="submit" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-semibold hover:bg-indigo-100 transition">
             🔁 Convert
           </button>
         </div>
@@ -36,10 +36,15 @@
       <!-- Result Display -->
       <div id="result" class="mt-6 hidden">
         <h3 class="text-xl font-semibold mb-4">Sign Output</h3>
-        <!-- Example sign image (replace with actual logic later) -->
-        <img src="https://media.giphy.com/media/l41YgSO6ZrTc9nUty/giphy.gif" alt="Sign Animation" class="mx-auto rounded-lg shadow-lg max-h-64">
+        
+        <video id="signVideo" controls autoplay muted loop class="mx-auto rounded-lg shadow-lg max-h-64 hidden">
+          <source src="" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        <img id="fallbackGif" src="" alt="Fallback GIF" class="mx-auto rounded-lg shadow-lg max-h-64">
       </div>
-    </div>
+
   </main>
 
   <footer class="text-center p-4 bg-white/10 backdrop-blur-sm">
@@ -51,12 +56,10 @@
   const resultDiv = document.getElementById('result');
   const micBtn = document.getElementById('micBtn');
   const textInput = document.getElementById('textInput');
+  const form = document.getElementById('ConvertVideo');
+  const fallbackGif = document.getElementById('fallbackGif');
+  const signVideo = document.getElementById('signVideo'); // ✅ Keep this one at the top only
 
-  convertBtn.onclick = () => {
-    if (textInput.value.trim() !== '') {
-      resultDiv.classList.remove('hidden');
-    }
-  };
 
   micBtn.onclick = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
@@ -94,6 +97,44 @@
       micBtn.innerText = '🎤 Speak';
       micBtn.disabled = false;
     };
+  };
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+
+    const text = textInput.value.trim();
+    if (!text) return;
+
+    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    const response = await fetch("{% url 'play_video' %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text })
+    });
+
+    const data = await response.json();
+    console.log("Response:", data);
+
+    if (response.ok && data.video) {
+      console.log("Setting video src to:", data.video);
+
+      signVideo.src = data.video;
+      signVideo.classList.remove('hidden');
+      fallbackGif.classList.add('hidden');
+      resultDiv.classList.remove('hidden');
+
+      signVideo.load();
+      signVideo.play().catch(err => console.error("Autoplay blocked or error playing:", err));
+    } else {
+      signVideo.classList.add('hidden');
+      fallbackGif.classList.remove('hidden');
+      fallbackGif.src = "https://i.giphy.com/media/l41YgSO6ZrTc9nUty/giphy.gif"; // ✅ Correct direct URL
+    }
+
   };
   </script>
 </body>

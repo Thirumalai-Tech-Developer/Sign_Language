@@ -89,6 +89,24 @@ def prediction(request):
 @csrf_exempt
 def play_video(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        text = data.get('text', '')
-        
+        try:
+            data = json.loads(request.body)
+            text = data.get('text', '').strip()
+            text = text.lower()
+            print("Received text:", text)
+
+            video_filename = text + ".mp4"
+            video_dir = os.path.join(settings.MEDIA_ROOT, "text_video")
+            
+            for video in os.listdir(video_dir):
+                if video == video_filename:
+                    video_url = os.path.join(settings.MEDIA_URL, "text_video", video)
+                    return JsonResponse({'video': video_url})
+
+            return JsonResponse({'error': 'Video not found'}, status=404)
+
+        except Exception as e:
+            print("Error:", str(e))
+            return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    return JsonResponse({'error': 'Invalid method'}, status=405)
