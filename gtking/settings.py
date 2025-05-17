@@ -129,4 +129,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 MEDIA_FOLDER = BASE_DIR / 'media'
-TOKENIZER_PATH = BASE_DIR / 'token' / 'tokenizer.json'
+TOKENIZER_PATH = BASE_DIR / 'base' / 'token' / 'tokenizer.json'
+
+
+MODEL_PATH = BASE_DIR / 'model' / 'GT.pth'

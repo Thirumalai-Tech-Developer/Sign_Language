@@ -3,13 +3,20 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
-from .models import model, GraphFramemrk
+from .models import GTv1GraphConfig, GTv1GraphModel, GraphFramemrk
 import torch
 import base.tokenizer as tokenizer
 from .PreProcess import HandSignSingle
+import os
 
 MEDIA_FOLDER = settings.MEDIA_FOLDER
 TOKEN_PATH = settings.TOKENIZER_PATH
+MODEL_PATH = settings.MODEL_PATH
+
+config = GTv1GraphConfig()
+model = GTv1GraphModel(config)
+
+model.load_state_dict(torch.load(MODEL_PATH, map_location='cpu'), strict=False)
 
 def base(request):
     return render(request, "index.html")
@@ -48,15 +55,20 @@ def prediction(request):
         GraphFramemrk(video_path=str(latest_video), out_csv=out_csv)
 
         # Prepare graph data from CSV
-        input_ids, edge, batch = HandSignSingle(csv_path=out_csv)
+        dataset = HandSignSingle(csv_path=out_csv)
+        input_ids, edge, batch = dataset[0]
 
         # Model prediction
         with torch.no_grad():
             output = model(input_ids, edge, batch)
-            prediction_id = torch.argmax(output, dim=1).item()
+            if output is not None and output.numel() > 0:
+                prediction_id = torch.argmax(output, dim=1).item()
+            else:
+                prediction_id = -1  # or some default/failure indicator
+
 
         prediction_id = str(prediction_id)
-        predicted_label = tokenizer(prediction_id)
+        predicted_label = tokenizer.tokenize(prediction_id, token_path=TOKEN_PATH)
 
         return JsonResponse({
             'prediction': predicted_label,
@@ -64,3 +76,7 @@ def prediction(request):
         })
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+def speech():
+    pass

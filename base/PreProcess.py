@@ -39,7 +39,7 @@ class HandSignSingle(Dataset):
         self.max_frames = self.data.shape[0]
 
     def __len__(self):
-        return 1 
+        return 1
     
     def __getitem__(self, index):
 
